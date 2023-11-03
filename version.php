@@ -9,5 +9,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_mylearners';
-$plugin->version = 1;
+$plugin->version = 14;
 $plugin->requires = 2016052314; // Moodle version

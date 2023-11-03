@@ -15,10 +15,12 @@
 //G
 //H
 //I
+    $string['invalid_idp'] = 'Invalid id provided';
 //J
 //L
 //M
 //N
+    $string['no_idp'] = 'No id provided';
 //O
 //P
     $string['pluginname'] = 'My Learners';
@@ -31,4 +33,5 @@
 //W
 //X
 //Y
+    $string['you_dhrr'] = "You don't have the required role";
 //Z
