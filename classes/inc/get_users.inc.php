@@ -29,7 +29,32 @@ if(!isset($_POST['id'])){
             $data = $lib->get_users_list_data($id);
             //only set a return in the returnText class if the array is not empty
             if($data != []){
-                $returnText->return = $data;
+                //Create HTML to send as a response
+                $returnText->return = "<h2 class='text-center'>".$lib->get_course_fullname($id)."</h2>
+                    <table class='table table-bordered table-striped table-hover'>
+                        <thead>
+                            <tr>
+                                <th>".get_string('learner', $p)."</th>
+                                <th>".get_string('course_p', $p)."</th>
+                                <th>".get_string('competency_ar', $p)."</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                ";
+                foreach($data as $dat){
+                    $returnText->return .= "
+                            <tr>
+                                <td><a href='./../user/view.php?id=$dat[1]&course=$id'>$dat[0]</a></td>
+                                <td>$dat[2]%</td>
+                                <td>$dat[3]</td>
+                            </tr>
+                    ";
+                }
+                $returnText->return .= "</tbody></table>";
+                //Remove blank spaces from the return to reduce the size of the response
+                $returnText->return = str_replace("  ","",$returnText->return);
+            } else {
+                $returnText->return = "<h2 class='text-danger text-center'>".get_string('no_la', $p)."</h2>";
             }
         }
     }

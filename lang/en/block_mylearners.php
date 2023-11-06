@@ -9,6 +9,8 @@
 //A
 //B
 //C
+    $string['course_p'] = 'Course progress';
+    $string['competency_ar'] = 'Competencies awaiting review';
 //D
 //E
 //F
@@ -18,9 +20,11 @@
     $string['invalid_idp'] = 'Invalid id provided';
 //J
 //L
+    $string['learner'] = 'Learner';
 //M
 //N
     $string['no_idp'] = 'No id provided';
+    $string['no_la'] = 'No learners available';
 //O
 //P
     $string['pluginname'] = 'My Learners';

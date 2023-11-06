@@ -96,7 +96,7 @@ class lib{
                         LEFT JOIN {user} u ON u.id = ue.userid
                         WHERE ue.userid = ? AND e.courseid = ?',
                     [$arr, $courseid]);
-                    if(count($record) > 0){
+                    if($record->id != null){
                         array_push($users, [$record->firstname.' '.$record->lastname, $arr]);
                     }
                 }
@@ -124,5 +124,11 @@ class lib{
             }
         }
         return [];
+    }
+
+    //Get the course full name for a specific course id
+    public function get_course_fullname($id): string{
+        global $DB;
+        return $DB->get_record_sql('SELECT fullname FROM {course} WHERE id = ?',[$id])->fullname;
     }
 }

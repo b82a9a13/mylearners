@@ -1,0 +1,9 @@
+.table-section{
+    border: 2px solid #95287A;
+    border-radius: 5px;
+    padding: .5rem;
+    background: #FCFCFC;
+}
+.c-pointer{
+    cursor: pointer;
+}

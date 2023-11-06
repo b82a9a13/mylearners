@@ -21,12 +21,12 @@ class block_mylearners extends block_base{
         $data = $lib->get_course_list();
         //Only output data if the array is not empty
         if($data != []){
-            $this->content->text .= "<div class='text-center'>";
+            $this->content->text .= "<link rel='stylesheet' href='./../blocks/mylearners/classes/css/block_mylearners.css'><div class='text-center'>";
             //Add the buttons to the content
             foreach($data as $dat){
                 $this->content->text .= "<button class='btn btn-primary mr-1 mb-1' onclick='bml_get_users($dat[1])'>$dat[0]</button>";
             }
-            $this->content->text .= "</div><h2 class='text-danger text-center' id='bml_mylearners_error'></h2><div id='bml_mylearners_div' style='display:none;'></div><script src='./../blocks/mylearners/amd/min/block_mylearners.min.js'></script>";
+            $this->content->text .= "</div><h2 class='text-danger text-center' id='bml_mylearners_error'></h2><div id='bml_mylearners_div' style='display:none;' class='table-section'></div><script src='./../blocks/mylearners/amd/min/block_mylearners.min.js'></script>";
         }
     }
 }
