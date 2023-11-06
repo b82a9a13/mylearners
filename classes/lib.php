@@ -68,6 +68,7 @@ class lib{
                     }
                 }
             }
+            asort($list);
             return $list;
         }
         return [];
