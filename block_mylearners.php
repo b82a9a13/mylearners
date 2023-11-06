@@ -17,16 +17,26 @@ class block_mylearners extends block_base{
         $this->content->text = '';
         //Create lib variable from the lib class
         $lib = new lib();
-        //Get an array of the courses which have users for the learning supervisor.
-        $data = $lib->get_course_list();
-        //Only output data if the array is not empty
-        if($data != []){
-            $this->content->text .= "<link rel='stylesheet' href='./../blocks/mylearners/classes/css/block_mylearners.css'><div class='text-center'>";
-            //Add the buttons to the content
+        //Check if the user has the supervisor role
+        if($lib->has_supervisor_role()){
+            $data = $lib->get_plans_list();
+            //Create HTML for the block
+            $this->content->text .= "
+                <link rel='stylesheet' href='./../blocks/mylearners/classes/css/block_mylearners.css'>
+                <div class='text-center'>
+            ";
+            //Add a button for each learning plan
             foreach($data as $dat){
                 $this->content->text .= "<button class='btn btn-primary mr-1 mb-1' onclick='bml_get_users($dat[1])'>$dat[0]</button>";
             }
-            $this->content->text .= "</div><h2 class='text-danger text-center' id='bml_mylearners_error'></h2><div id='bml_mylearners_div' style='display:none;' class='table-section'></div><script src='./../blocks/mylearners/amd/min/block_mylearners.min.js'></script>";
+            $this->content->text .= "
+                </div>
+                <h2 class='text-danger text-center' id='bml_mylearners_error'></h2>
+                <div id='bml_mylearners_div' style='display:none;' class='table-section'></div>
+                <script src='./../blocks/mylearners/amd/min/block_mylearners.min.js' defer></script>
+            ";
+            //Reduce the size of the HTML
+            $this->content->text = str_replace("  ","",$this->content->text);
         }
     }
 }

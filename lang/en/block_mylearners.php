@@ -9,8 +9,6 @@
 //A
 //B
 //C
-    $string['course_p'] = 'Course progress';
-    $string['competency_ar'] = 'Competencies awaiting review';
 //D
 //E
 //F
@@ -24,16 +22,18 @@
 //M
 //N
     $string['no_idp'] = 'No id provided';
-    $string['no_la'] = 'No learners available';
 //O
 //P
     $string['pluginname'] = 'My Learners';
+    $string['progress'] = 'Progress';
 //Q
 //R
 //S
 //T
+    $string['total_car'] = 'Total competencies awaiting review';
 //U
 //V
+    $string['view_l'] = 'View Learners';
 //W
 //X
 //Y

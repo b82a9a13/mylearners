@@ -48,87 +48,93 @@ class lib{
         return ($this->supervisor_roles() != []) ? True : False;
     }
 
-    //Function is called to retrieve all the courses which the current user has users assigned to them in the course
-    public function get_course_list(): array{
+    //Function is called to get all learning plans that the current user is a LPS for
+    public function get_plans_list(): array{
         global $DB;
-        //Get a list of all the users with the current user assigned as supervisor for.
+        //Get a list of the users which the current user is a LPS for
         $array = $this->supervisor_roles();
         if($array != []){
-            $courses = [];
-            //Retrieve the courses which the array of learners are enrolled in and add it to the array if it isn't already in it.
+            //Create a new list of all the unique competency templates used.
+            $list = [];
             foreach($array as $arr){
-                $records = $DB->get_records_sql('SELECT ue.id as id, e.id as enrolid, e.courseid as courseid, c.fullname as fullname FROM {user_enrolments} ue 
-                    LEFT JOIN {enrol} e ON e.id = ue.enrolid
-                    LEFT JOIN {course} c ON c.id = e.courseid
-                    WHERE ue.userid = ? AND e.roleid = 5',
+                //Get the competency plans and the template used for the user
+                $records = $DB->get_records_sql('SELECT cp.id as id, cp.name as name, ct.id as templateid FROM {competency_plan} cp
+                    LEFT JOIN {competency_template} ct ON ct.id = cp.templateid
+                    WHERE cp.userid = ?',
                 [$arr]);
                 foreach($records as $record){
-                    if(!in_array([$record->fullname, $record->courseid], $courses)){
-                        array_push($courses, [$record->fullname, $record->courseid]);
+                    if(!in_array([$record->name, $record->templateid], $list)){
+                        array_push($list, [$record->name, $record->templateid]);
                     }
                 }
             }
-            asort($courses);
-            return $courses;
+            return $list;
         }
         return [];
     }
 
-    //Function is called to check if the a course with a specific id exists
-    private function check_course_exists($courseid): bool{
+    //Function is called to check if a template with a sepcific id exists
+    private function check_template_exists($id): bool{
         global $DB;
-        return $DB->record_exists('course', [$DB->sql_compare_text('id') => $courseid]);
+        return $DB->record_exists('competency_template', [$DB->sql_compare_text('id') => $id]);
     }
 
-    //Function is called to get all leanrers which have the current user as their learning plan superviosor and for a specific course
-    public function get_users_list_data($courseid): array{
+    //Function is called to get a users full name from a sepcific id
+    private function get_user_fullname($id): string{
         global $DB;
-        //Check if the course exists
-        if($this->check_course_exists($courseid)){
-            //Get all users which are the current user is a LPS for
+        $record = $DB->get_record_sql('SELECT id, firstname, lastname FROM {user} WHERE id = ?',[$id]);
+        return $record->firstname.' '.$record->lastname;
+    }
+
+    //Function is called to get all learners which have the current user as their LPS for a specific template id
+    public function get_user_list_data($id): array{
+        global $DB;
+        //Check if the competency template exists
+        if($this->check_template_exists($id)){
+            //set $array to an array of all the users the current user is LPS for
             $array = $this->supervisor_roles();
             if($array != []){
-                $users = [];
-                //Get all users which are enrolled in the course provided
-                foreach($array as $arr){
-                    $record = $DB->get_record_sql('SELECT ue.id as id, u.firstname as firstname, u.lastname as lastname FROM {user_enrolments} ue
-                        LEFT JOIN {enrol} e ON e.id = ue.enrolid
-                        LEFT JOIN {user} u ON u.id = ue.userid
-                        WHERE ue.userid = ? AND e.courseid = ?',
-                    [$arr, $courseid]);
-                    if($record->id != null){
-                        array_push($users, [$record->firstname.' '.$record->lastname, $arr]);
+                //Get all competencies related to a template
+                $records = $DB->get_records_sql('SELECT id, competencyid FROM {competency_templatecomp} WHERE templateid = ?',[$id]);
+                if(count($records) > 0){
+                    //Put the competencies into an array
+                    $comptencies = [];
+                    foreach($records as $record){
+                        array_push($comptencies, $record->competencyid);
                     }
-                }
-                asort($users);
-                if($users != []){
-                    $array = [];
-                    //Get the total completion percentage and number of competencies awaiting review for each user and push an array to $array
-                    foreach($users as $user){
-                        //Get the total complete and the total number of modules in a specific course
-                        $complete = $DB->get_record_sql('SELECT count(*) as total FROM {course_modules} c
-                            INNER JOIN {course_modules_completion} cm ON cm.coursemoduleid = c.id
-                            WHERE c.course = ? AND c.completion != 0 AND cm.userid = ? AND cm.completionstate = 1',
-                        [$courseid, $user[1]])->total;
-                        $total = $DB->get_record_sql('SELECT count(*) as total FROM {course_modules} WHERE course = ? and completion != 0',[$courseid])->total;
-                        $awaitReview = $DB->get_record_sql('SELECT count(*) as total FROM {competency_usercomp} WHERE userid = ? AND status = 1',[$user[1]])->total;
-                        if($total - $complete == 0){
-                            array_push($array, [$user[0], $user[1], 100, $awaitReview]);
-                        } else {
-                            $percentage = ($complete / $total) * 100;
-                            array_push($array, [$user[0], $user[1], $percentage, $awaitReview]);
+                    //Get the name of the template and assign it to the variable $name
+                    $name = $DB->get_record_sql('SELECT id, shortname FROM {competency_template} WHERE id = ?',[$id])->shortname;
+                    //Create $data array which has [0] as the name and total number of competencies for the template
+                    $data = [[$name, count($comptencies)], []];
+                    //Loop through all users the current user is LPS for
+                    foreach($array as $arr){
+                        //Check if the user has a plan with the template id
+                        $planid = $DB->get_record_sql('SELECT id FROM {competency_plan} WHERE userid = ? and templateid = ?',[$arr, $id])->id;
+                        if($planid != null){
+                            //Get all competencies for the the current user
+                            $comps = $DB->get_records_sql('SELECT id, userid, competencyid, status, proficiency FROM {competency_usercomp} WHERE userid = ?',[$arr]);
+                            //Put the total number of competencies awaiting review and the number of complete competencies into variables
+                            $awaitReview = 0;
+                            $complete = 0;
+                            foreach($comps as $comp){
+                                if(in_array($comp->competencyid, $comptencies)){
+                                    if($comp->status == 1){
+                                        $awaitReview++;
+                                    } elseif($comp->status == 0 && $comp->proficiency == 1){
+                                        $complete++;
+                                    }
+                                }
+                            }
+                            //Add the user data to the $data[1] array
+                            array_push($data[1], [$this->get_user_fullname($arr), $arr, $awaitReview, $complete, $planid]);
                         }
                     }
-                    return $array;
+                    //Sort the user data by name
+                    asort($data[1]);
+                    return $data;
                 }
             }
         }
         return [];
-    }
-
-    //Get the course full name for a specific course id
-    public function get_course_fullname($id): string{
-        global $DB;
-        return $DB->get_record_sql('SELECT fullname FROM {course} WHERE id = ?',[$id])->fullname;
     }
 }

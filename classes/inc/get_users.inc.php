@@ -25,36 +25,30 @@ if(!isset($_POST['id'])){
             $returnText->error = get_string('you_dhrr', $p);
         } else {
             //Has the supervisor role
-            //Get data for the current user and course id provided
-            $data = $lib->get_users_list_data($id);
-            //only set a return in the returnText class if the array is not empty
+            $data = $lib->get_user_list_data($id);
             if($data != []){
-                //Create HTML to send as a response
-                $returnText->return = "<h2 class='text-center'>".$lib->get_course_fullname($id)."</h2>
+                $returnText->return = "<h2 class='text-center'>".$data[0][0]."</h2>
                     <table class='table table-bordered table-striped table-hover'>
                         <thead>
                             <tr>
                                 <th>".get_string('learner', $p)."</th>
-                                <th>".get_string('course_p', $p)."</th>
-                                <th>".get_string('competency_ar', $p)."</th>
+                                <th>".get_string('progress', $p)."</th>
+                                <th>".get_string('total_car', $p)."</th>
                             </tr>
                         </thead>
                         <tbody>
                 ";
-                foreach($data as $dat){
+                foreach($data[1] as $dat){
                     $returnText->return .= "
                             <tr>
-                                <td><a href='./../user/view.php?id=$dat[1]&course=$id'>$dat[0]</a></td>
-                                <td>$dat[2]%</td>
-                                <td>$dat[3]</td>
+                                <td><a href='./../user/view.php?id=$dat[1]'>$dat[0]</a></td>
+                                <td>$dat[3]/".$data[0][1]."</td>
+                                <td>$dat[2] <a href='./../admin/tool/lp/plan.php?id=$dat[4]'>&rarr;</a></td>
                             </tr>
                     ";
                 }
                 $returnText->return .= "</tbody></table>";
-                //Remove blank spaces from the return to reduce the size of the response
                 $returnText->return = str_replace("  ","",$returnText->return);
-            } else {
-                $returnText->return = "<h2 class='text-danger text-center'>".get_string('no_la', $p)."</h2>";
             }
         }
     }
