@@ -27,6 +27,7 @@ if(!isset($_POST['id'])){
             //Has the supervisor role
             $data = $lib->get_user_list_data($id);
             if($data != []){
+                //Create HTML to send as a response
                 $returnText->return = "<h2 class='text-center'>".$data[0][0]."</h2>
                     <table class='table table-bordered table-striped table-hover'>
                         <thead>

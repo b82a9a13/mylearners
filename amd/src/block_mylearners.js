@@ -5,7 +5,7 @@ function bml_get_users(id){
         //Define the div and errorText variables
         const div = $('#bml_mylearners_div')[0];
         const errorText = $('#bml_mylearners_error')[0];
-        //Set the display to none;
+        //Set the display to none
         errorText.style.display = 'none';
         div.style.display = 'none';
         //Create the xhr variable
