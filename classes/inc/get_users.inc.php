@@ -39,15 +39,20 @@ if(!isset($_POST['id'])){
                         </thead>
                         <tbody>
                 ";
+                //Script variable is used to store HTML that is used to render the chart
+                $script = '';
+                //Add a record in the table for each user
                 foreach($data[1] as $dat){
                     $returnText->return .= "
                             <tr>
                                 <td><a href='./../user/view.php?id=$dat[1]'>$dat[0]</a></td>
-                                <td>$dat[3]/".$data[0][1]."</td>
+                                <td class='bml-progress-td'><canvas class='bml-chart' id='bml_$dat[1]_$dat[4]'></canvas>$dat[3]/".$data[0][1]."</td>
                                 <td>$dat[2] <a href='./../admin/tool/lp/plan.php?id=$dat[4]'>&rarr;</a></td>
                             </tr>
                     ";
+                    $script .= "bml_render_chart('bml_$dat[1]_$dat[4]', ".$data[0][1].", $dat[3], $dat[2]);";
                 }
+                $returnText->script = $script;
                 $returnText->return .= "</tbody></table>";
                 $returnText->return = str_replace("  ","",$returnText->return);
             }

@@ -4,6 +4,16 @@
     padding: .5rem;
     background: #FCFCFC;
 }
+.bml-progress-td{
+    align-items:center;
+    justify-content:left;
+    display:flex;
+    border:0px;
+}
 .c-pointer{
     cursor: pointer;
+}
+.bml-chart{
+    width: 75px;
+    height: 37.5px;
 }
